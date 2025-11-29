@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Города России: Достопримечательности</title>
+    <style>
+        /* --- ПЕРЕМЕННЫЕ ЦВЕТОВ (Флаг РФ) --- */
+        :root {
+            --rus-white: #ffffff;
+            --rus-blue: #0039A6; /* Официальный синий */
+            --rus-red: #D52B1E;  /* Официальный красный */
+            --bg-gray: #f0f2f5;
+            --text-dark: #333;
+        }
+
+        /* --- Сброс и база --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Шапка сайта (Триколор) --- */
+        header {
+            background-color: var(--rus-blue);
+            color: var(--rus-white);
+            padding: 40px 20px 50px 20px;
+            text-align: center;
+            position: relative;
+            border-bottom: 8px solid var(--rus-red);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Белая полоса сверху */
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background-color: var(--rus-white);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.8rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 25px;
+        }
+
+        /* --- Поле поиска --- */
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 18px 25px;
+            font-size: 18px;
+            border: 2px solid transparent;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #search-input:focus {
+            border-color: var(--rus-red);
+            transform: scale(1.01);
+            box-shadow: 0 8px 25px rgba(213, 43, 30, 0.15);
+        }
+
+        /* --- Контейнер --- */
+        main {
+            max-width: 1200px;
+            margin: -30px auto 40px auto;
+            padding: 0 20px;
+            flex-grow: 1;
+            z-index: 2;
+            position: relative;
+        }
+
+        .cities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        /* --- Карточка города --- */
+        .city-card {
+            background: var(--rus-white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border-top: 4px solid var(--rus-blue);
+        }
+
+        .city-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 15px 30px rgba(0,57,166, 0.15);
+        }
+
+        .city-image-container {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+        }
+
+        .city-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .city-card:hover .city-image {
+            transform: scale(1.05);
+        }
+
+        .city-info {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .city-name {
+            font-size: 1.6rem;
+            color: var(--rus-blue);
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .city-gerb {
+            width: 50px;
+            height: 60px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        .city-desc {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .sights-section {
+            background-color: #f9fbfd;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 3px solid var(--rus-red);
+        }
+
+        .sights-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sights-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .sights-list li {
+            position: relative;
+            padding-left: 18px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        .sights-list li::before {
+            content: "•";
+            color: var(--rus-red);
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: absolute;
+            left: 0;
+            top: -3px;
+        }
+
+        .no-results {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #777;
+            margin-top: 50px;
+            display: none;
+            grid-column: 1 / -1;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        footer {
+            background-color: #e9ecef;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #ddd;
+            margin-top: auto;
+        }
+
+        footer span {
+            color: var(--rus-red);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Величие России</h1>
+    <div class="subtitle">Путеводитель по городам и их истории</div>
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Найти город или достопримечательность...">
+    </div>
+</header>
+
+<main>
+    <div class="cities-grid" id="cities-container">
+        <!-- Карточки будут добавлены здесь -->
+        <div class="no-results" id="no-results">
+            По вашему запросу ничего не найдено.
+        </div>
+    </div>
+</main>
+
+<footer>
+    Сделано с любовью к России <span>&#10084;</span> | 2023
+</footer>
+
+<script>
+    // Используем конструкцию Special:FilePath для вечных ссылок на гербы
+    const WIKI_BASE = "https://commons.wikimedia.org/wiki/Special:FilePath/";
+
+    const citiesData = [
+        {
+            name: "Москва",
+            description: "Столица Российской Федерации, город-герой. Крупнейший по численности населения город России.",
+            image: "https://images.unsplash.com/photo-1513326738677-b964603b136d?auto=format&fit=crop&w=600&q=80",
+            coatOfArms: "Coat_of_Arms_of_Moscow.svg",
+            sights: ["Красная площадь", "Московский Кремль", "Храм Христа Спасителя", "ВДНХ", "Москва-Сити"]
+        },
+        {
+            name: "Санкт-Петербург",
+            description: "Культурная столица России, город белых ночей и разводных мостов.",
+            image: "https://images.unsplash.com/photo-1556610961-2fecc5927173?auto=format&fit=crop&w=600&q=80",
+            coatOfArms: "Coat_of_Arms_of_Saint_Petersburg_(2003).svg",
+            sights: ["Государственный Эрмитаж", "Петропавловская крепость", "Храм Спас на Крови", "Исаакиевский собор", "Петергоф"]
+        },
+        {
+            name: "Казань",
+            description: "«Третья столица России», город с тысячелетней историей, объединяющий культуру Востока и Запада.",
+            image: "https://images.unsplash.com/photo-1628151016140-6a2c270e5b41?auto=format&fit=crop&w=600&q=80",
+            coatOfArms: "Coat_of_Arms_of_Kazan_(Tatarstan).svg",
+            sights: ["Казанский Кремль", "Мечеть Кул-Шариф", "Дворец земледельцев", "Озеро Кабан", "Башня Сююмбике"]
+        },
+        {
+            name: "Сочи",
+            description: "Главный город-курорт России, столица XXII зимних Олимпийских игр.",
+            image: "https://images.unsplash.com/photo-1542314831-068cd1dbd02b?auto=format&fit=crop&w=600&q=80",
+            coatOfArms: "Coat_of_Arms_of_Sochi_(Krasnodar_krai).svg",
+            sights: ["Олимпийский парк", "Курорт Красная Поляна", "Парк «Ривьера»", "Сочинский дендрарий", "Морской вокзал"]
+        },
+        {
+            name: "Екатеринбург",
+            description: "Столица Урала, четвёртый по численности населения город в России.",
+            image: "https://images.unsplash.com/photo-1588673759955-4674757c320d?auto=format&fit=crop&w=600&q=80",
+            coatOfArms: "Coat_of_Arms_of_Yekaterinburg_(Sverdlovsk_oblast).svg",
+            sights: ["Ельцин Центр", "Храм-на-Крови", "Усадьба Расторгуевых", "Плотинка", "Небоскрёб «Высоцкий»"]
+        },
+        {
+            name: "Владивосток",
+            description: "Крупнейший порт России на Тихом океане, центр Приморского края.",
+            image: "https://images.unsplash.com/photo-1557088481-9f9392e22268?auto=format&fit=crop&w=600&q=80",
+            coatOfArms: "Coat_of_Arms_of_Vladivostok.svg",
+            sights: ["Золотой мост", "Русский мост", "Токаревский маяк", "Приморский океанариум", "Спортивная набережная"]
+        },
+        {
+            name: "Калининград",
+            description: "Самый западный областной центр страны, бывший Кёнигсберг.",
+            image: "https://images.unsplash.com/photo-1569420601348-154cb432e6a1?auto=format&fit=crop&w=600&q=80",
+            coatOfArms: "Coat_of_Arms_of_Kaliningrad_(2006).svg",
+            sights: ["Кёнигсбергский собор", "Рыбная деревня", "Музей янтаря", "Куршская коса", "Амалиенау"]
+        },
+        {
+            name: "Нижний Новгород",
+            description: "Один из древнейших торговых городов, расположенный на слиянии Оки и Волги.",
+            image: "https://images.unsplash.com/photo-1596956763721-e37456d9585f?auto=format&fit=crop&w=600&q=80",
+            coatOfArms: "Coat_of_Arms_of_Nizhny_Novgorod.svg",
+            sights: ["Нижегородский кремль", "Чкаловская лестница", "Большая Покровская улица", "Рождественская улица", "Стрелка"]
+        }
+    ];
+
+    const container = document.getElementById('cities-container');
+    const searchInput = document.getElementById('search-input');
+    const noResults = document.getElementById('no-results');
+
+    function renderCities(cities) {
+        // Удаляем только карточки
+        const cards = container.querySelectorAll('.city-card');
+        cards.forEach(card => card.remove());
+
+        if (cities.length === 0) {
+            noResults.style.display = 'block';
+        } else {
+            noResults.style.display = 'none';
+
+            cities.forEach(city => {
+                const card = document.createElement('div');
+                card.className = 'city-card';
+
+                const sightsList = city.sights.map(sight => `<li>${sight}</li>`).join('');
+
+                // Формируем полную ссылку на герб
+                const gerbUrl = WIKI_BASE + city.coatOfArms;
+
+                card.innerHTML = `
+                    <div class="city-image-container">
+                        <img src="${city.image}" alt="${city.name}" class="city-image" loading="lazy">
+                    </div>
+                    <div class="city-info">
+                        <div class="card-header">
+                            <h2 class="city-name">${city.name}</h2>
+                            <img src="${gerbUrl}" alt="Герб ${city.name}" class="city-gerb" title="Герб города ${city.name}">
+                        </div>
+                        <p class="city-desc">${city.description}</p>
+                        <div class="sights-section">
+                            <div class="sights-title">Достопримечательности:</div>
+                            <ul class="sights-list">
+                                ${sightsList}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        const searchText = e.target.value.toLowerCase().trim();
+        const filteredCities = citiesData.filter(city => {
+            return city.name.toLowerCase().includes(searchText) ||
+                   city.sights.some(sight => sight.toLowerCase().includes(searchText));
+        });
+        renderCities(filteredCities);
+    });
+
+    // Запуск
+    renderCities(citiesData);
+
+</script>
+
+</body>
+</html>
